@@ -1,0 +1,80 @@
+#!/usr/bin/python3
+import os
+import requests
+import bs4
+import sys
+arguments = sys.argv
+
+#create bac folder if ir dosent exist and chdir into it
+if os.path.exists('bac') == False :
+    os.makedirs('bac')
+os.chdir('bac')
+
+optionList = [
+    'Allemand',
+    'Espagnol',
+    'Russe',
+    'chinois',
+    'Turque',
+    'Italien',
+    'Ã\x89ducation Musicale',
+    'Arts & Plastiques',
+    'ThÃ©Ã¢tre'
+    ]
+
+mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
+soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
+subjContainer = soup.find_all('tbody')
+subjectList = subjContainer[0].find_all('tr')
+
+for subject in subjectList:
+    sectionList = subject.find_all('td')
+    try:
+        subjectName = sectionList[0].text
+        sectionInfo = sectionList[7]
+        subjectExist = sectionInfo.select('a')
+        if (len(subjectExist) != 0):
+            linkToSubject = 'http://www.bacweb.tn/'+subjectExist[0]['href']
+            if subjectName in optionList:
+                # print('OPTION : '+subjectName)
+                pass
+            else:
+                print(subjectName)
+                subjectPageSource = requests.get(linkToSubject)
+                soup2 = bs4.BeautifulSoup(subjectPageSource.text, 'lxml')
+                yearsContainer = soup2.find_all('tbody')
+                yearsList = soup2.find_all('tr')
+                for year in yearsList:
+                    subjectsByYear = year.find_all('td')
+                    try:
+                        yearNumber = int(subjectsByYear[0].text)
+                        yearNumberS = str(yearNumber)
+
+                        if os.path.exists(yearNumberS) == False :
+                            os.makedirs(yearNumberS)
+
+                        principale_Sujet  = subjectsByYear[1].find_all('a')
+                        if len(principale_Sujet) != 0:
+                            link_principale_Sujet = 'http://www.bacweb.tn/'+principale_Sujet[0]['href']
+
+                        principale_Corige = subjectsByYear[2].find_all('a')
+                        if len(principale_Corige) != 0:
+                            link_principale_Corige = 'http://www.bacweb.tn/'+principale_Corige[0]['href']
+
+                        controle_Sujet   = subjectsByYear[3].find_all('a')
+                        if len(controle_Sujet) != 0:
+                            link_controle_Sujet = 'http://www.bacweb.tn/'+controle_Sujet[0]['href']
+
+                        controle_Corrige = subjectsByYear[4].find_all('a')
+                        if len(controle_Corrige) != 0:
+                            link_controle_Corrige = 'http://www.bacweb.tn/'+controle_Corrige[0]['href']
+
+
+
+
+                    except:
+                        pass
+
+
+    except:
+        pass
