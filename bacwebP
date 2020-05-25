@@ -29,7 +29,7 @@ mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
 soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
 subjContainer = soup.find_all('tbody')
 subjectList = subjContainer[0].find_all('tr')
-i=0
+
 for subject in subjectList:
     sectionList = subject.find_all('td')
     try:
@@ -84,19 +84,43 @@ for subject in subjectList:
                             os.chdir(projectDir+yearNumberDir+'principale')
                             curDir = os.getcwd()+'/'
                             if os.path.exists(curDir+sujName) == False:
-                                os.system('curl -O '+link_principale_Sujet+' &> ~/trashLOG')
+                                os.system('curl -O '+link_principale_Sujet+' &> /dev/null')
                             os.chdir(projectDir)
 
                         principale_Corige = subjectsByYear[2].find_all('a')
                         if len(principale_Corige) != 0:
                             link_principale_Corige = 'http://www.bacweb.tn/'+principale_Corige[0]['href']
+                            sujName = link_principale_Corige
+                            p = sujName.rindex('/')
+                            sujName = sujName[p+1:]
+                            os.chdir(projectDir+yearNumberDir+'principale')
+                            curDir = os.getcwd()+'/'
+                            if os.path.exists(curDir+sujName) == False:
+                                os.system('curl -O '+link_principale_Corige+' &> /dev/null')
+                            os.chdir(projectDir)
 
                         controle_Sujet   = subjectsByYear[3].find_all('a')
                         if len(controle_Sujet) != 0:
                             link_controle_Sujet = 'http://www.bacweb.tn/'+controle_Sujet[0]['href']
+                            sujName = link_controle_Sujet
+                            p = sujName.rindex('/')
+                            sujName = sujName[p+1:]
+                            os.chdir(projectDir+yearNumberDir+'controle')
+                            curDir = os.getcwd()+'/'
+                            if os.path.exists(curDir+sujName) == False:
+                                os.system('curl -O '+link_controle_Sujet+' &> /dev/null')
+                            os.chdir(projectDir)
 
                         controle_Corrige = subjectsByYear[4].find_all('a')
                         if len(controle_Corrige) != 0:
                             link_controle_Corrige = 'http://www.bacweb.tn/'+controle_Corrige[0]['href']
+                            sujName = link_controle_Corrige
+                            p = sujName.rindex('/')
+                            sujName = sujName[p+1:]
+                            os.chdir(projectDir+yearNumberDir+'controle')
+                            curDir = os.getcwd()+'/'
+                            if os.path.exists(curDir+sujName) == False:
+                                os.system('curl -O '+link_controle_Corrige+' &> /dev/null')
+                            os.chdir(projectDir)
 
                         os.chdir(projectDir)
