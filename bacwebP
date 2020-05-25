@@ -5,10 +5,13 @@ import bs4
 import sys
 arguments = sys.argv
 
+currentDir = os.getcwd()+'/'
 #create bac folder if ir dosent exist and chdir into it
 if os.path.exists('bac') == False :
     os.makedirs('bac')
-os.chdir('bac')
+os.chdir(currentDir+'bac')
+
+projectDir = os.getcwd()+'/'
 
 optionList = [
     'Allemand',
@@ -26,11 +29,16 @@ mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
 soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
 subjContainer = soup.find_all('tbody')
 subjectList = subjContainer[0].find_all('tr')
-
+i=0
 for subject in subjectList:
     sectionList = subject.find_all('td')
     try:
         subjectName = sectionList[0].text
+        ok1 = True
+    except:
+        ok1 = False
+
+    if ok1:
         sectionInfo = sectionList[7]
         subjectExist = sectionInfo.select('a')
         if (len(subjectExist) != 0):
@@ -46,16 +54,38 @@ for subject in subjectList:
                 yearsList = soup2.find_all('tr')
                 for year in yearsList:
                     subjectsByYear = year.find_all('td')
+
                     try:
                         yearNumber = int(subjectsByYear[0].text)
-                        yearNumberS = str(yearNumber)
+                        ok2 = True
+                    except:
+                        ok2 = False
 
-                        if os.path.exists(yearNumberS) == False :
-                            os.makedirs(yearNumberS)
+                    if ok2:
+                        yearNumberDir = str(yearNumber)+'/'
+
+                        if os.path.exists(projectDir+yearNumberDir) == False :
+                            os.makedirs(projectDir+yearNumberDir)
+
+                        os.chdir(projectDir+yearNumberDir)
+
+                        if os.path.exists(projectDir+yearNumberDir+'principale') == False :
+                            os.makedirs(projectDir+yearNumberDir+'principale')
+
+                        if os.path.exists(projectDir+yearNumberDir+'controle') == False :
+                            os.makedirs(projectDir+yearNumberDir+'controle')
 
                         principale_Sujet  = subjectsByYear[1].find_all('a')
                         if len(principale_Sujet) != 0:
                             link_principale_Sujet = 'http://www.bacweb.tn/'+principale_Sujet[0]['href']
+                            sujName = link_principale_Sujet
+                            p = sujName.rindex('/')
+                            sujName = sujName[p+1:]
+                            os.chdir(projectDir+yearNumberDir+'principale')
+                            curDir = os.getcwd()+'/'
+                            if os.path.exists(curDir+sujName) == False:
+                                os.system('curl -O '+link_principale_Sujet+' &> ~/trashLOG')
+                            os.chdir(projectDir)
 
                         principale_Corige = subjectsByYear[2].find_all('a')
                         if len(principale_Corige) != 0:
@@ -69,12 +99,4 @@ for subject in subjectList:
                         if len(controle_Corrige) != 0:
                             link_controle_Corrige = 'http://www.bacweb.tn/'+controle_Corrige[0]['href']
 
-
-
-
-                    except:
-                        pass
-
-
-    except:
-        pass
+                        os.chdir(projectDir)
