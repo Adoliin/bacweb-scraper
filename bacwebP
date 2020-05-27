@@ -39,8 +39,12 @@ for subject in subjectList:
         ok1 = False
 
     if ok1:
-        sectionInfo = sectionList[7]
-        subjectExist = sectionInfo.select('a')
+        # sectionInfo = sectionList[7]
+        # subjectExist = sectionInfo.select('a')
+
+        sectionMath = sectionList[1]
+        subjectExist = sectionMath.select('a')
+
         if (len(subjectExist) != 0):
             linkToSubject = 'http://www.bacweb.tn/'+subjectExist[0]['href']
             if subjectName in optionList:
