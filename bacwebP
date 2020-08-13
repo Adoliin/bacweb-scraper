@@ -6,7 +6,7 @@ import sys
 arguments = sys.argv
 
 currentDir = os.getcwd()+'/'
-#create bac folder if ir dosent exist and chdir into it
+#create bac folder if it dosent exist and chdir into it
 if os.path.exists('bac') == False :
     os.makedirs('bac')
 os.chdir(currentDir+'bac')
@@ -26,7 +26,7 @@ optionList = [
     ]
 
 mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
-soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
+soup = bs4.BeautifulSoup(mainPageSource.text, 'html.parser')
 subjContainer = soup.find_all('tbody')
 subjectList = subjContainer[0].find_all('tr')
 
@@ -41,9 +41,11 @@ for subject in subjectList:
     if ok1:
         # sectionInfo = sectionList[7]
         # subjectExist = sectionInfo.select('a')
-
-        sectionMath = sectionList[1]
-        subjectExist = sectionMath.select('a')
+        # sectionMath = sectionList[1]
+        # subjectExist = sectionMath.select('a')
+        
+        sectionScience = sectionList[2]
+        subjectExist = sectionScience.select('a')
 
         if (len(subjectExist) != 0):
             linkToSubject = 'http://www.bacweb.tn/'+subjectExist[0]['href']
@@ -53,7 +55,7 @@ for subject in subjectList:
             else:
                 print(subjectName)
                 subjectPageSource = requests.get(linkToSubject)
-                soup2 = bs4.BeautifulSoup(subjectPageSource.text, 'lxml')
+                soup2 = bs4.BeautifulSoup(subjectPageSource.text, 'html.parser')
                 yearsContainer = soup2.find_all('tbody')
                 yearsList = soup2.find_all('tr')
                 for year in yearsList:
