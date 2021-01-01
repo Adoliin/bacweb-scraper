@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import os
 import requests
 import bs4
@@ -17,38 +16,56 @@ optionList = [
     'Arts & Plastiques',
     'ThÃ©Ã¢tre'
     ]
-sectionDict = {
-    'math':      1,
-    'science':   2,
-    'economie':  3,
-    'technique': 4,
-    'lettres':   5,
-    'sport':     6,
-    'info':      7,
-}
 
 def main():
     global projectDir
     projectDir = initDir()
     mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
-    soup = bs4.BeautifulSoup(mainPageSource.text, 'html.parser')
+    soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
     subjectList = soup.find_all('tbody')[0].find_all('tr')
-    getSection(subjectList, sectionDict['science'])
+    sectionNum = menu()
+    if sectionNum == 8:
+        for i in range(7):
+            getSection(subjectList, i+1)
+    else:
+        getSection(subjectList, sectionNum)
+
+def menu():
+    print('Chose section(s) to download:')
+    print('[1] Math')
+    print('[2] Science')
+    print('[3] Economie')
+    print('[4] Technique')
+    print('[5] Lettres')
+    print('[6] Sport')
+    print('[7] Info')
+    print('[8] ALL')
+    while True:
+        ans = input('--> ')
+        if ans in ['1', '2', '3', '4', '5', '6', '7', '8']:
+            return int(ans)
+        else:
+            print('You must pick a number from the menu!')
+            continue
+
 
 def initDir():
     #create bac folder if it dosent exist and chdir into it
     if os.path.exists('bac') == False :
         os.makedirs('bac')
-    os.chdir(os.getcwd() + '/bac')
-    return os.getcwd() + '/'
+    projectDir = os.path.join(os.getcwd(), 'bac')
+    os.chdir(projectDir)
+    return projectDir + '/'
 
 def getSection(subjectList, sectionNum):
     for subject in subjectList:
         sectionList = subject.find_all('td')
         try:
             subjectName = sectionList[0].text
+        except:
+            pass
         else:
-            sectionSubject = sectionList[sectionNum]
+            sectionSubject = sectionList[sectionNum].select('a')
             if len(sectionSubject) != 0:
                 linkToSubject = 'http://www.bacweb.tn/'+sectionSubject[0]['href']
                 if subjectName in optionList:
@@ -60,17 +77,18 @@ def getSection(subjectList, sectionNum):
 def getSubject(linkToSubject, subjectName):
     print(subjectName)
     subjectPageSource = requests.get(linkToSubject)
-    soup = bs4.BeautifulSoup(subjectPageSource.text, 'html.parser')
-    yearsContainer = soup.find_all('tbody')
+    soup = bs4.BeautifulSoup(subjectPageSource.text, 'lxml')
     yearsList = soup.find_all('tr')
     for year in yearsList:
         subjectsByYear = year.find_all('td')
         try:
             yearNumber = int(subjectsByYear[0].text)
+        except:
+            pass
         else:
-            getYear(yearNumber)
+            getYear(yearNumber, subjectsByYear)
 
-def getYear(yearNumber):
+def getYear(yearNumber, subjectsByYear):
     yearNumberDir = str(yearNumber) + '/'
     if os.path.exists(projectDir+yearNumberDir) == False :
         os.makedirs(projectDir+yearNumberDir)
@@ -103,9 +121,8 @@ def getSujet(sujet, yearNumberDir, promotion):
         os.chdir(projectDir+yearNumberDir+promotion)
         currentDir = os.getcwd()+'/'
         if os.path.exists(currentDir+sujetName) == False:
-            os.system('curl -O '+sujetLink+' &> /dev/null')
+            os.system(f'wget -O "{sujetLink}" &> /dev/null')
         os.chdir(projectDir)
-
 
 if __name__ == '__main__':
     main()
