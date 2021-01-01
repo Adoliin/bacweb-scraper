@@ -15,15 +15,21 @@ optionList = [
     'Ã\x89ducation Musicale',
     'Arts & Plastiques',
     'ThÃ©Ã¢tre'
-    ]
+]
+sections_g = [
+    'math',
+    'science',
+    'economie',
+    'technique',
+    'lettres',
+    'sport',
+    'info',
+]
+bacDir = os.path.join(os.getcwd(),'bac')
 
 def main():
-    global projectDir
-    projectDir = initDir()
-    mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
-    soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
-    subjectList = soup.find_all('tbody')[0].find_all('tr')
     sectionNum = menu()
+    subjectList = getSubjectList()
     if sectionNum == 8:
         for i in range(7):
             getSection(subjectList, i+1)
@@ -48,16 +54,24 @@ def menu():
             print('You must pick a number from the menu!')
             continue
 
+def getSubjectList():
+    mainPageSource = requests.get('http://www.bacweb.tn/section.htm')
+    soup = bs4.BeautifulSoup(mainPageSource.text, 'lxml')
+    return soup.find_all('tbody')[0].find_all('tr')
 
-def initDir():
+def getProjectDir(section):
     #create bac folder if it dosent exist and chdir into it
-    if os.path.exists('bac') == False :
-        os.makedirs('bac')
-    projectDir = os.path.join(os.getcwd(), 'bac')
+    projectDir = os.path.join(bacDir, f'bac-{section}')
+    if os.path.exists(projectDir) == False :
+        os.makedirs(projectDir)
     os.chdir(projectDir)
-    return projectDir + '/'
+    return projectDir
 
 def getSection(subjectList, sectionNum):
+    sectionName = sections_g[sectionNum-1]
+    global projectDir
+    projectDir = getProjectDir(sectionName)
+    print(f'\n~~~Downloading "{sectionName}" section:~~~')
     for subject in subjectList:
         sectionList = subject.find_all('td')
         try:
@@ -75,7 +89,7 @@ def getSection(subjectList, sectionNum):
                     getSubject(linkToSubject, subjectName)
 
 def getSubject(linkToSubject, subjectName):
-    print(subjectName)
+    print(f'Downloading all of "{subjectName}" exams of current section.')
     subjectPageSource = requests.get(linkToSubject)
     soup = bs4.BeautifulSoup(subjectPageSource.text, 'lxml')
     yearsList = soup.find_all('tr')
@@ -89,15 +103,18 @@ def getSubject(linkToSubject, subjectName):
             getYear(yearNumber, subjectsByYear)
 
 def getYear(yearNumber, subjectsByYear):
-    yearNumberDir = str(yearNumber) + '/'
-    if os.path.exists(projectDir+yearNumberDir) == False :
-        os.makedirs(projectDir+yearNumberDir)
+    yearNumberDir = os.path.join(projectDir, str(yearNumber))
+    if os.path.exists(yearNumberDir) == False :
+        os.makedirs(yearNumberDir)
+    os.chdir(yearNumberDir)
 
-    os.chdir(projectDir+yearNumberDir)
-    if os.path.exists(projectDir+yearNumberDir+'principale') == False :
-        os.makedirs(projectDir+yearNumberDir+'principale')
-    if os.path.exists(projectDir+yearNumberDir+'controle') == False :
-        os.makedirs(projectDir+yearNumberDir+'controle')
+    sessionDir_P = os.path.join(yearNumberDir, 'principale')
+    if os.path.exists(sessionDir_P) == False :
+        os.makedirs(sessionDir_P)
+
+    sessionDir_C = os.path.join(yearNumberDir, 'controle')
+    if os.path.exists(sessionDir_C) == False :
+        os.makedirs(sessionDir_C)
 
     principale_sujet  = subjectsByYear[1].find_all('a')
     getSujet(principale_sujet, yearNumberDir, 'principale')
@@ -118,10 +135,11 @@ def getSujet(sujet, yearNumberDir, promotion):
         sujetLink = 'http://www.bacweb.tn/'+sujet[0]['href']
         p = sujetLink.rindex('/')
         sujetName = sujetLink[p+1:]
-        os.chdir(projectDir+yearNumberDir+promotion)
-        currentDir = os.getcwd()+'/'
-        if os.path.exists(currentDir+sujetName) == False:
-            os.system(f'wget -O "{sujetLink}" &> /dev/null')
+        promotionDir = os.path.join(yearNumberDir, promotion)
+        os.chdir(promotionDir)
+        sujetDir = os.path.join(promotionDir, sujetName)
+        if os.path.exists(sujetDir) == False:
+            os.system(f'wget "{sujetLink}" &> /dev/null')
         os.chdir(projectDir)
 
 if __name__ == '__main__':
