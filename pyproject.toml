@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "bacweb-parser"
+version = "0.1.0"
+description = ""
+authors = ["Adolin <benmeft0@gamil.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.25.1"
+bs4 = "^0.0.1"
+lxml = "^4.6.2"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
