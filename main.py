@@ -37,7 +37,7 @@ def main():
         getSection(subjectList, sectionNum)
 
 def menu():
-    print('Chose section(s) to download:')
+    print('Choose section(s) to download:')
     print('[1] Math')
     print('[2] Science')
     print('[3] Economie')
