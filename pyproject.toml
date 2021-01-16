@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bacweb-parser"
+name = "bacweb-scraper"
 version = "0.1.0"
 description = ""
 authors = ["Adolin <benmeft0@gamil.com>"]
