@@ -1,33 +1,38 @@
 # Bacweb Scraper
 A simple python program to download all tests of the "Tunisian Baccalaureate"
 of all available sections.
-# Getting Started
+## Getting Started
 
-## Prerequisites
-As speciefied in the "pyproject.toml", these are the modules dependancies for this project:
+### Prerequisites
+As specified in the "pyproject.toml", these are the modules dependencies for this project:
 - python 3.9
 - requests
 - bs4
 - lxml
 
-External dependancy:
+External dependency:
 - wget (for downloading the tests PDFs)
  
-## Installing
+### Installing
 To install it just do so by pressing the "Code" button and then press "Download ZIP".
-Or by git cloning this repositopry like this:
+Or by git cloning this repository like this:
 `git clone https://github.com/adoliin/bacweb-scraper`
 
-# Usage
+## Usage
 From GUI:
 Go to the project folder and press the "main.py" file
 
 From command line:
-cd to the project diretory to the `cd bacweb-parser`
-And execute it `python main.py`
+Go to the project directory to the:
+`cd bacweb-parser`
+And execute the program:
+`python main.py`
 
-After executing the program you a menu will appear and you can
+After executing the program, a menu will appear and you can
 type the number of the section you want to download the tests from or
 type "8" to download all available tests from all sections.
 The program will then create a "bac" directory containing all the tests ordered
 by year.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
